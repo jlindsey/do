@@ -1,0 +1,7 @@
+{
+    admin off
+}
+
+gitea.xalda-galaxy.ts.net {
+    reverse_proxy gitea:3000
+}

@@ -1,0 +1,59 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json
+---
+version: "3"
+
+networks:
+  gitea:
+    external: false
+
+services:
+  db:
+    image: postgres:14-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: gitea
+      POSTGRES_PASSWORD: gitea
+      POSTGRES_DB: gitea
+    networks:
+      - gitea
+    volumes:
+      - /mnt/data/pg:/var/lib/postgresql/data
+
+  gitea:
+    image: gitea/gitea:latest
+    restart: always
+    container_name: gitea
+    environment:
+      USER_UID: 1000
+      USER_GIT: 1000
+      GITEA__database__DB_TYPE: postgres
+      GITEA__database__DB_HOST: db:5432
+      GITEA__database__DB_NAME: gitea
+      GITEA__database__DB_USER: gitea
+      GITEA__database__DB_PASSWD: gitea
+    networks:
+      - gitea
+    ports:
+      - 3000
+      - 222:22
+    volumes:
+      - /mnt/data/git:/data
+      - /home/git/.ssh:/data/git/.ssh
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - db
+
+  caddy:
+    image: caddy:2-alpine
+    restart: always
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - /mnt/data/caddy:/data
+      - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock:rw
+    ports:
+      - 443:443
+    networks:
+      - gitea
+    depends_on:
+      - gitea
