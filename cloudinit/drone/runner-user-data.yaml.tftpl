@@ -1,0 +1,41 @@
+#cloud-config
+# yaml-language-server: $schema=https://raw.githubusercontent.com/canonical/cloud-init/main/cloudinit/config/schemas/versions.schema.cloud-config.json
+---
+apt:
+  preserve_sources_list: true
+  sources:
+    tailscale:
+      source: "deb https://pkgs.tailscale.com/stable/debian bullseye main"
+      key: ${tailscale_apt_key}
+    docker:
+      source: "deb https://download.docker.com/linux/debian bullseye stable"
+      key: ${docker_apt_key}
+
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+packages:
+  - zsh
+  - htop
+  - git
+  - tailscale
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-compose-plugin
+
+write_files:
+  - path: /root/docker-compose.yaml
+    encoding: b64
+    owner: root:root
+    permissions: "0o644"
+    content: ${drone_compose}
+  - path: /root/.env
+    encoding: b64
+    owner: root:root
+    permissions: "0o600"
+    content: ${env_file}
+
+runcmd:
+  - ["sudo", "tailscale", "up", "--authkey", "${tailscale_key}"]
+  - ["sudo", "docker", "compose", "-f", "/root/docker-compose.yaml", "up", "-d"]

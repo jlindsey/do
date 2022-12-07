@@ -1,0 +1,13 @@
+---
+kind: pipeline
+type: docker
+name: lint
+
+steps:
+  - name: validate
+    image: hashicorp/terraform
+    commands:
+      - validate
+
+  - name: tflint
+    image: terraform-linters/tflint-bundle

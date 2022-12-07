@@ -1,0 +1,34 @@
+#cloud-config
+# yaml-language-server: $schema=https://raw.githubusercontent.com/canonical/cloud-init/main/cloudinit/config/schemas/versions.schema.cloud-config.json
+---
+apt:
+  preserve_sources_list: true
+  sources:
+    tailscale:
+      source: "deb https://pkgs.tailscale.com/stable/debian bullseye main"
+      key: ${tailscale_apt_key}
+
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+packages:
+  - zsh
+  - htop
+  - git
+  - tailscale
+
+disk_setup:
+  /dev/sda:
+    table_type: gpt
+    layout: true
+    overwrite: false
+
+fs_setup:
+  - label: gitea
+    filesystem: ext4
+    partition: auto
+    device: /dev/sda
+    overwrite: false
+
+mounts:
+  - ["/dev/sda", "/mnt", "ext4", "defaults", "0", "0"]

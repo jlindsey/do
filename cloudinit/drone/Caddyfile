@@ -1,0 +1,7 @@
+{
+    admin off
+}
+
+drone.xalda-galaxy.ts.net {
+    reverse_proxy drone:80
+}

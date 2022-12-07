@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json
+---
+version: "3"
+
+services:
+  db:
+    image: postgres:14-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: drone
+      POSTGRES_PASSWORD: drone
+      POSTGRES_DB: drone
+    volumes:
+      - /mnt/data/pg:/var/lib/postgresql/data
+
+  drone:
+    image: drone/drone:2
+    container_name: drone
+    restart: always
+    env_file: .env
+    ports:
+      - 80
+    depends_on:
+      - db
+
+  caddy:
+    image: caddy:2-alpine
+    restart: always
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock:rw
+    ports:
+      - 443:443
+    depends_on:
+      - drone

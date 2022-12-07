@@ -31,7 +31,7 @@ disk_setup:
     overwrite: false
 
 fs_setup:
-  - label: gitea
+  - label: drone
     filesystem: ext4
     partition: auto
     device: /dev/sda
@@ -41,34 +41,23 @@ mounts:
   - ["/dev/sda", "/mnt", "ext4", "defaults", "0", "0"]
 
 write_files:
-  - path: /root/gitea-compose.yaml
+  - path: /root/docker-compose.yaml
     encoding: b64
     owner: root:root
     permissions: "0o644"
-    content: ${gitea_compose}
+    content: ${drone_compose}
   - path: /root/Caddyfile
     encoding: b64
     owner: root:root
     permissions: "0o644"
     content: ${caddyfile}
-  - path: /var/run/cloud-tmp/ssh-shim
+  - path: /root/.env
     encoding: b64
-    content: ${ssh_shim}
-
-groups:
-  - docker
-
-users:
-  - default
-  - name: git
-    groups: docker
-    shell: /home/git/ssh-shim
-    uid: 1000
+    owner: root:root
+    permissions: "0o600"
+    content: ${env_file}
 
 runcmd:
-  - ["sudo", "mv", "/var/run/cloud-tmp/ssh-shim", "/home/git"]
-  - ["sudo", "chmod", "+x", "/home/git/ssh-shim"]
-  - ["sudo", "chown", "git:git", "/home/git/ssh-shim"]
-  - ["sudo", "mkdir", "-p", "/mnt/data/pg", "/mnt/data/git", "/mnt/data/caddy"]
+  - ["sudo", "mkdir", "-p", "/mnt/data/pg"]
   - ["sudo", "tailscale", "up", "--authkey", "${tailscale_key}"]
-  - ["sudo", "docker", "compose", "-f", "/root/gitea-compose.yaml", "up", "-d"]
+  - ["sudo", "docker", "compose", "-f", "/root/docker-compose.yaml", "up", "-d"]
