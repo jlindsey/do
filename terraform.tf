@@ -23,10 +23,17 @@ terraform {
       source  = "tailscale/tailscale"
       version = "~> 0.13"
     }
+
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.4"
+    }
   }
 }
 
 provider "digitalocean" {}
+
+provider "random" {}
 
 provider "tailscale" {
   tailnet = "jlindsey.github"

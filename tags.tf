@@ -1,5 +1,7 @@
 locals {
   tags = [
+    "drone",
+    "gitea",
     "ssh",
     "tailscale",
     "minecraft",

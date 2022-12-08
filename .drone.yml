@@ -7,7 +7,9 @@ steps:
   - name: validate
     image: hashicorp/terraform
     commands:
-      - validate
+      - terraform validate
 
   - name: tflint
     image: terraform-linters/tflint-bundle
+    commands:
+      - tflint
