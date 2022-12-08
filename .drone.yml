@@ -15,6 +15,6 @@ steps:
       - terraform validate
 
   - name: tflint
-    image: ghcr.io/terraform-linters/tflint-bundle:v0.43.0
+    image: ghcr.io/terraform-linters/tflint-bundle:v0.43.0.2
     commands:
       - tflint
