@@ -6,7 +6,10 @@ name: lint
 steps:
   - name: validate
     image: hashicorp/terraform
+    environment:
+      TF_IN_AUTOMATION: 1
     commands:
+      - terraform init
       - terraform validate
 
   - name: tflint
