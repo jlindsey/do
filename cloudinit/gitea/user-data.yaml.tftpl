@@ -41,6 +41,11 @@ mounts:
   - ["/dev/sda", "/mnt", "ext4", "defaults", "0", "0"]
 
 write_files:
+  - path: /root/.zshrc
+    encoding: b64
+    owner: root:root
+    permissions: "0644"
+    content: ${zshrc}
   - path: /root/docker-compose.yaml
     encoding: b64
     owner: root:root
@@ -68,6 +73,9 @@ users:
     uid: 1000
 
 runcmd:
+  - ["sudo", "chsh", "-s", "/usr/bin/zsh", "root"]
+  - ["curl", "-sSLo", "/tmp/install.sh", "https://starship.rs/install.sh"]
+  - ["sudo", "sh", "/tmp/install.sh", "-y"]
   - ["sudo", "mkdir", "-p", "/mnt/data/pg", "/mnt/data/git", "/mnt/data/caddy"]
   - ["sudo", "tailscale", "up", "--authkey", "${tailscale_key}"]
   - ["sudo", "docker", "compose", "-f", "/root/docker-compose.yaml", "up", "-d"]

@@ -5,11 +5,11 @@ apt:
   preserve_sources_list: true
   sources:
     tailscale:
-      source: "deb https://pkgs.tailscale.com/stable/debian bullseye main"
+      source: deb https://pkgs.tailscale.com/stable/debian bullseye main
       key: ${tailscale_apt_key}
-    docker:
-      source: "deb https://download.docker.com/linux/debian bullseye stable"
-      key: ${docker_apt_key}
+    corretto:
+      source: deb https://apt.corretto.aws stable main
+      key: ${corretto_apt_key}
 
 package_update: true
 package_upgrade: true
@@ -17,12 +17,27 @@ package_reboot_if_required: true
 packages:
   - zsh
   - htop
+  - tmux
   - git
+  - jq
   - tailscale
-  - docker-ce
-  - docker-ce-cli
-  - containerd.io
-  - docker-compose-plugin
+  - java-17-amazon-corretto-jdk
+
+disk_setup:
+  /dev/sda:
+    table_type: gpt
+    layout: true
+    overwrite: false
+
+fs_setup:
+  - label: world
+    filesystem: ext4
+    partition: auto
+    device: /dev/sda
+    overwrite: false
+
+mounts:
+  - ["/dev/sda", "/mnt", "ext4", "defaults", "0", "0"]
 
 write_files:
   - path: /root/.zshrc
@@ -30,20 +45,20 @@ write_files:
     owner: root:root
     permissions: "0644"
     content: ${zshrc}
-  - path: /root/docker-compose.yaml
+  - path: /usr/local/bin/download-helper.sh
     encoding: b64
+    content: ${download_helper}
     owner: root:root
-    permissions: "0o644"
-    content: ${drone_compose}
-  - path: /root/.env
-    encoding: b64
-    owner: root:root
-    permissions: "0o600"
-    content: ${env_file}
+    permissions: "0o755"
+
+users:
+  - default
+  - name: minecraft
 
 runcmd:
   - ["sudo", "chsh", "-s", "/usr/bin/zsh", "root"]
   - ["curl", "-sSLo", "/tmp/install.sh", "https://starship.rs/install.sh"]
   - ["sudo", "sh", "/tmp/install.sh", "-y"]
+  - ["sudo", "mkdir", "-p", "/mnt/minecraft"]
   - ["sudo", "tailscale", "up", "--authkey", "${tailscale_key}"]
-  - ["sudo", "docker", "compose", "-f", "/root/docker-compose.yaml", "up", "-d"]
+  - ["sudo", "/usr/local/bin/download-helper.sh"]

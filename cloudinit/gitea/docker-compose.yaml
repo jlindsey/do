@@ -31,6 +31,8 @@ services:
       GITEA__database__DB_NAME: gitea
       GITEA__database__DB_USER: gitea
       GITEA__database__DB_PASSWD: gitea
+      GITEA__cron_0X2E_resync_all_sshkeys__ENABLED: true
+      GITEA__cron_0X2E_resync_all_sshkeys__RUN_AT_START: true
     networks:
       - gitea
     ports:

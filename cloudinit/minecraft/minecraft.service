@@ -1,0 +1,14 @@
+# -*- mode: systemd -*-
+[Unit]
+Description=Minecraft Server
+After=network.target
+
+[Service]
+WorkingDirectory=/mnt/minecraft
+User=minecraft
+Group=minecraft
+Restart=on-failure
+ExecStart=/usr/bin/tmux -s mc -d './start.sh'
+
+[Install]
+WantedBy=multi-user.target

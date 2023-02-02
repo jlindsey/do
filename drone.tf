@@ -61,6 +61,7 @@ resource "digitalocean_droplet" "drone_master" {
   user_data = templatefile("${path.module}/cloudinit/drone/master-user-data.yaml.tftpl", {
     tailscale_apt_key = jsonencode(file("${path.module}/cloudinit/tailscale.key"))
     docker_apt_key    = jsonencode(file("${path.module}/cloudinit/docker.key"))
+    zshrc             = filebase64("${path.module}/cloudinit/zshrc")
     tailscale_key     = tailscale_tailnet_key.drone_master.key
     drone_compose     = filebase64("${path.module}/cloudinit/drone/master-docker-compose.yaml")
     caddyfile         = filebase64("${path.module}/cloudinit/drone/Caddyfile")
@@ -85,6 +86,7 @@ resource "digitalocean_droplet" "drone_runner" {
   user_data = templatefile("${path.module}/cloudinit/drone/runner-user-data.yaml.tftpl", {
     tailscale_apt_key = jsonencode(file("${path.module}/cloudinit/tailscale.key"))
     docker_apt_key    = jsonencode(file("${path.module}/cloudinit/docker.key"))
+    zshrc             = filebase64("${path.module}/cloudinit/zshrc")
     tailscale_key     = tailscale_tailnet_key.drone_runners[count.index].key
     drone_compose     = filebase64("${path.module}/cloudinit/drone/runner-docker-compose.yaml")
     env_file          = base64encode(local.drone_runner_env_file)

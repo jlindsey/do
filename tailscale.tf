@@ -17,9 +17,8 @@ resource "tailscale_tailnet_key" "drone_runners" {
   expiry        = 600
 }
 
-
-# resource "tailscale_tailnet_key" "minecraft" {
-#   reusable      = false
-#   preauthorized = true
-#   expiry        = 600
-# }
+resource "tailscale_tailnet_key" "minecraft" {
+  reusable      = false
+  preauthorized = true
+  expiry        = 600
+}
